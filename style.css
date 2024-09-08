@@ -1,0 +1,9 @@
+body, html{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#gameCanvas{
+    border:3px solid #000000;
+}
