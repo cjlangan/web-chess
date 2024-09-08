@@ -3,7 +3,9 @@ const ctx = canvas.getContext('2d');
 
 const grid_size = 8;
 const tile_size = canvas.width / grid_size;
+
 const assets = {};
+const pieces = [];
 
 main();
 
@@ -17,28 +19,43 @@ function main()
     setTimeout(() => {
 
 
-    const p = new Pawn(1, 7);
+    pieces.push(new Piece("w", "P", 1, 7));
+    pieces.push(new Piece("b", "K", 2, 8));
+    pieces.push(new Piece("w", "Q", 3, 3));
+    pieces.push(new Piece("b", "B", 8, 5));
+
+    draw_pieces();
 
 
     }, 100);
 }
 
-function Pawn(x, y)
+function Piece(colour, type, x, y)
 {
     this.x = (x - 1) * tile_size;
-    this.y = (y - 1) * tile_size;
-    
+    this.y = (grid_size - y) * tile_size;
+    this.colour = colour;
+    this.type = type;
+
     this.move = function(x, y)
     {
-        ctx.clearRect(this.x, this.y, tile_size, tile_size);
-        
         this.x = (x - 1) * tile_size;
-        this.y = (y - 1) * tile_size;
-
-        ctx.drawImage(assets.wP, this.x, this.y);
+        this.y = (grid_size - y) * tile_size;
     }
     
+    this.draw = function()
+    {
+        const imageKey = `${this.colour}${this.type}`;
+        const image = assets[imageKey];
+        ctx.drawImage(image, this.x, this.y);
+    }
+
     this.move(x, y);
+}
+
+function draw_pieces()
+{
+    pieces.forEach(piece => piece.draw());
 }
 
 function load_assets()
@@ -58,16 +75,16 @@ function load_assets()
 
     assets.wP.src = './assets/wP.svg';
     assets.wN.src = './assets/wN.svg';
-    assets.wK.src = './assets/wN.svg';
-    assets.wB.src = './assets/wN.svg';
-    assets.wQ.src = './assets/wN.svg';
-    assets.wR.src = './assets/wN.svg';
-    assets.bP.src = './assets/wP.svg';
-    assets.bN.src = './assets/wN.svg';
-    assets.bK.src = './assets/wN.svg';
-    assets.bB.src = './assets/wN.svg';
-    assets.bQ.src = './assets/wN.svg';
-    assets.bR.src = './assets/wN.svg';
+    assets.wK.src = './assets/wK.svg';
+    assets.wB.src = './assets/wB.svg';
+    assets.wQ.src = './assets/wQ.svg';
+    assets.wR.src = './assets/wR.svg';
+    assets.bP.src = './assets/bP.svg';
+    assets.bN.src = './assets/bN.svg';
+    assets.bK.src = './assets/bK.svg';
+    assets.bB.src = './assets/bB.svg';
+    assets.bQ.src = './assets/bQ.svg';
+    assets.bR.src = './assets/bR.svg';
 }
 
 function make_board()
@@ -82,7 +99,7 @@ function make_board()
             }
             else
             {
-                ctx.fillStyle = 'black';
+                ctx.fillStyle = 'grey';
             }
             ctx.fillRect(row * tile_size, col * tile_size, tile_size, tile_size);
         }
