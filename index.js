@@ -53,100 +53,83 @@ function display_possible_moves(colour, type, x, y)
 {
     switch(type)
     {
-            /*
         case "P":
-            if(colour === "w")
-            {
-                markers.push(new Piece("g", "M", x, y + 1))
-                markers.push(new Piece("g", "M", x, y + 2))
-            }
-            else
-            {
-                markers.push(new Piece("g", "M", x, y - 1))
-                markers.push(new Piece("g", "M", x, y - 2))
-            }
             break;
-
         case "N":
-            markers.push(new Piece("g", "M", x - 2, y - 1));
-            markers.push(new Piece("g", "M", x - 2, y + 1));
-            markers.push(new Piece("g", "M", x - 1, y - 2));
-            markers.push(new Piece("g", "M", x - 1, y + 2));
-            markers.push(new Piece("g", "M", x + 2, y + 1));
-            markers.push(new Piece("g", "M", x + 2, y - 1));
-            markers.push(new Piece("g", "M", x + 1, y + 2));
-            markers.push(new Piece("g", "M", x + 1, y - 2));
             break;
-
         case "K":
-            markers.push(new Piece("g", "M", x - 1, y - 1));
-            markers.push(new Piece("g", "M", x - 1, y));
-            markers.push(new Piece("g", "M", x - 1, y + 1));
-            markers.push(new Piece("g", "M", x + 1, y - 1));
-            markers.push(new Piece("g", "M", x + 1, y));
-            markers.push(new Piece("g", "M", x + 1, y + 1));
-            markers.push(new Piece("g", "M", x, y + 1));
-            markers.push(new Piece("g", "M", x, y - 1));
+            king_scan(x, y);
             break;
-
         case "B":
-            for(let i = -8; i < 8; i++)
-            {
-                markers.push(new Piece("g", "M", x + i, y + i));
-                markers.push(new Piece("g", "M", x - i, y + i));
-            }
+            piece_scan(x, y, 1, 1);
+            piece_scan(x, y, 1, -1);
+            piece_scan(x, y, -1, 1);
+            piece_scan(x, y, -1, -1);
             break;
-
-        case "Q":
-            for(let i = -8; i < 8; i++)
-            {
-                markers.push(new Piece("g", "M", x + i, y + i));
-                markers.push(new Piece("g", "M", x - i, y + i));
-                markers.push(new Piece("g", "M", x + i, y));
-                markers.push(new Piece("g", "M", x, y + i));
-            }
-            break;
-            */
-
-        // Rook
         case "R":
-            // Check up
-            my = 1;
-            while(y + my < grid_size && board[x][y + my] === 0)
-            {
-                markers[x][y + my] = new Piece("g", "M", x, y + my);
-                my++;
-            }
-            if(y + my < grid_size && markers[x][y + my].colour != turn)
-            {
-                markers[x][y + my] = new Piece("g", "M", x, y + my);
-            }
-
-            // Check down
-            my = 1;
-            while(y - my >= 0 && board[x][y - my] === 0)
-            {
-                markers[x][y - my] = new Piece("g", "M", x, y - my);
-                my++;
-            }
-
-            // Check left
-            mx = 1;
-            while(x - mx >= 0 && board[x - mx][y] === 0)
-            {
-                markers[x - mx][y] = new Piece("g", "M", x - mx, y);
-                mx++;
-            }
-            
-            // Check right
-            mx = 1;
-            while(x + mx < grid_size && board[x + mx][y] === 0)
-            {
-                markers[x + mx][y] = new Piece("g", "M", x + mx, y);
-                mx++;
-            }
+            piece_scan(x, y, 0, 1);
+            piece_scan(x, y, 1, 0);
+            piece_scan(x, y, -1, 0);
+            piece_scan(x, y, 0, -1);
+            break;
+        case "Q":
+            piece_scan(x, y, 1, 1);
+            piece_scan(x, y, 1, -1);
+            piece_scan(x, y, -1, 1);
+            piece_scan(x, y, -1, -1);
+            piece_scan(x, y, 0, 1);
+            piece_scan(x, y, 1, 0);
+            piece_scan(x, y, -1, 0);
+            piece_scan(x, y, 0, -1);
             break;
     }
+}
+
+function king_scan(x, y)
+{
+    for(let i = -1; i < 2; i++)
+    {
+        for(let j = -1; j < 2; j++)
+        {
+            if(!(i === 0 && j === 0))
+            {
+                if(x + i >= 0 && x + i < grid_size && y + j >= 0 && j < grid_size)
+                {
+                    if(board[x + i][y + j] === 0 || board[x + i][y + j].colour != turn)
+                    {
+                        markers[x + i][y + j] = new Piece("g", "M", x + i, y + j);
+                    }
+                }
+            }
+        }
+    }
+}
+
+function piece_scan(x, y, marker_x, marker_y)
+{
+    mx = marker_x;
+    my = marker_y;
+
+    while(in_grid(x+mx, y+my) && !is_piece(x+mx, y+my))
+    {
+        markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
+        mx += marker_x;
+        my += marker_y;
+    }
+    if(in_grid(x+mx, y+my) && is_piece(x+mx, y+my) && board[x+mx][y+my].colour != turn)
+    {
+        markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
+    }
+}
+
+function in_grid(x, y)
+{
+    return x >= 0 && y >= 0 && x < grid_size && y < grid_size;
+}
+
+function is_piece(x, y)
+{
+    return board[x][y] != 0;
 }
 
 canvas.addEventListener('click', function(event) 
@@ -253,6 +236,10 @@ function pieces_setup()
 
 
     board[3][3] = new Piece("w", "R", 3, 3);
+    board[4][3] = new Piece("w", "B", 4, 3);
+    board[2][3] = new Piece("w", "Q", 2, 3);
+    board[5][3] = new Piece("w", "N", 5, 3);
+    board[6][3] = new Piece("w", "K", 6, 3);
 }
 
 
