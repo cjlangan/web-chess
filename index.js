@@ -4,11 +4,11 @@ const capture_sound = document.getElementById('captureSound');
 const check_sound = document.getElementById('checkSound');
 const ctx = canvas.getContext('2d');
 
-const size = Math.round(0.8 * Math.min(window.innerHeight, window.innerWidth) / 8) * 8;
+let size = Math.round(0.8 * Math.min(window.innerHeight, window.innerWidth) / 8) * 8;
 canvas.height = size;
 canvas.width = size;
 const grid_size = 8;
-const tile_size = canvas.width / grid_size;
+let tile_size = canvas.width / grid_size;
 
 const assets = {};
 const board = [];
@@ -24,6 +24,17 @@ main();
 
 function main()
 {
+    // Set event listener to dynamically change 
+    // size of board based on the size of the window.
+    window.addEventListener("resize", () => { 
+        size = Math.round(0.8 * Math.min(window.innerHeight, window.innerWidth) / 8) * 8;
+        canvas.height = size;
+        canvas.width = size;
+        tile_size = canvas.width / grid_size;
+        // Render board with updated size.
+        render()
+    } );
+
     // Set up
     load_assets();
     initialise_board();
@@ -43,6 +54,7 @@ function render()
     draw_pieces();
     draw_markers();
 }
+
 
 function initialise_board()
 {
