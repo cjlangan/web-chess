@@ -5,24 +5,24 @@ const grid_size = 8;
 const tile_size = canvas.width / grid_size;
 
 const assets = {};
-const pieces = [];
+const board = [];
 const markers = [];
+
+let turn = "w";
 
 main();
 
 function main()
 {
     // Set up
-    make_board();
     load_assets();
-
+    initialise_board();
+    
     // ensure assets are loaded
     setTimeout(() => {
 
     pieces_setup();
-    draw_pieces();
-    draw_markers();
-
+    render();
 
     }, 200);
 }
@@ -32,13 +32,28 @@ function render()
     make_board();
     draw_pieces();
     draw_markers();
-    console.log("rendered.");
+}
+
+function initialise_board()
+{
+    for(let i = 0; i < grid_size; i++)
+    {
+        board[i] = [];
+        markers[i] = [];
+        for(let j = 0; j < grid_size; j++)
+        {
+            board[i][j] = 0;
+            markers[i][j] = 0;
+        }
+    }
+    console.log(markers);
 }
 
 function display_possible_moves(colour, type, x, y)
 {
     switch(type)
     {
+            /*
         case "P":
             if(colour === "w")
             {
@@ -91,13 +106,44 @@ function display_possible_moves(colour, type, x, y)
                 markers.push(new Piece("g", "M", x, y + i));
             }
             break;
+            */
 
-
+        // Rook
         case "R":
-            for(let i = -8; i < 8; i++)
+            // Check up
+            my = 1;
+            while(y + my < grid_size && board[x][y + my] === 0)
             {
-                markers.push(new Piece("g", "M", x + i, y));
-                markers.push(new Piece("g", "M", x, y + i));
+                markers[x][y + my] = new Piece("g", "M", x, y + my);
+                my++;
+            }
+            if(y + my < grid_size && markers[x][y + my].colour != turn)
+            {
+                markers[x][y + my] = new Piece("g", "M", x, y + my);
+            }
+
+            // Check down
+            my = 1;
+            while(y - my >= 0 && board[x][y - my] === 0)
+            {
+                markers[x][y - my] = new Piece("g", "M", x, y - my);
+                my++;
+            }
+
+            // Check left
+            mx = 1;
+            while(x - mx >= 0 && board[x - mx][y] === 0)
+            {
+                markers[x - mx][y] = new Piece("g", "M", x - mx, y);
+                mx++;
+            }
+            
+            // Check right
+            mx = 1;
+            while(x + mx < grid_size && board[x + mx][y] === 0)
+            {
+                markers[x + mx][y] = new Piece("g", "M", x + mx, y);
+                mx++;
             }
             break;
     }
@@ -107,117 +153,131 @@ canvas.addEventListener('click', function(event)
 {
     // Determines mouse coordinates
     const rect = canvas.getBoundingClientRect();
-    const x_click = Math.round((event.clientX - rect.left + (tile_size / 2)) / tile_size);
-    const y_click = grid_size - Math.round((event.clientY - rect.top - (tile_size / 2)) / tile_size);
+    const x = Math.round((event.clientX - rect.left - (tile_size / 2)) / tile_size);
+    const y = grid_size - Math.round((event.clientY - rect.top - (tile_size / 2)) / tile_size) -1;
 
     // Clear all markers
-    markers.length = 0;
-
-    found_piece = false;
-    idx = 0;
-
-    // Find the piece at coordinates, if there is one.
-    while(!found_piece && idx < pieces.length)
+    for(let i = 0; i < grid_size; i++)
     {
-        if(pieces[idx].get_x() === x_click && pieces[idx].get_y() === y_click)
+        for(let j = 0; j < grid_size; j++)
         {
-            display_possible_moves( pieces[idx].colour,  pieces[idx].type, 
-                                    pieces[idx].get_x(), pieces[idx].get_y());
-            found_piece = true;
+            markers[i][j] = 0;
         }
-
-        idx++;
     }
 
+    // Find the piece at coordinates, if there is one.
+    if(board[x][y] != 0)
+    {
+        if(turn === board[x][y].colour)
+        {
+            display_possible_moves(board[x][y].colour,  board[x][y].type, x, y);
+        }
+    }
 
     render();
 });
-
-function pieces_setup()
-{
-    // Black Pieces
-    pieces.push(new Piece("b", "P", 1, 7));
-    pieces.push(new Piece("b", "P", 2, 7));
-    pieces.push(new Piece("b", "P", 3, 7));
-    pieces.push(new Piece("b", "P", 4, 7));
-    pieces.push(new Piece("b", "P", 5, 7));
-    pieces.push(new Piece("b", "P", 6, 7));
-    pieces.push(new Piece("b", "P", 7, 7));
-    pieces.push(new Piece("b", "P", 8, 7));
-
-    pieces.push(new Piece("b", "R", 1, 8));
-    pieces.push(new Piece("b", "N", 2, 8));
-    pieces.push(new Piece("b", "B", 3, 8));
-    pieces.push(new Piece("b", "Q", 4, 8));
-    pieces.push(new Piece("b", "K", 5, 8));
-    pieces.push(new Piece("b", "B", 6, 8));
-    pieces.push(new Piece("b", "N", 7, 8));
-    pieces.push(new Piece("b", "R", 8, 8));
-
-    // White Pieces
-    pieces.push(new Piece("w", "P", 1, 2));
-    pieces.push(new Piece("w", "P", 2, 2));
-    pieces.push(new Piece("w", "P", 3, 2));
-    pieces.push(new Piece("w", "P", 4, 2));
-    pieces.push(new Piece("w", "P", 5, 2));
-    pieces.push(new Piece("w", "P", 6, 2));
-    pieces.push(new Piece("w", "P", 7, 2));
-    pieces.push(new Piece("w", "P", 8, 2));
-
-    pieces.push(new Piece("w", "R", 1, 1));
-    pieces.push(new Piece("w", "N", 2, 1));
-    pieces.push(new Piece("w", "B", 3, 1));
-    pieces.push(new Piece("w", "Q", 4, 1));
-    pieces.push(new Piece("w", "K", 5, 1));
-    pieces.push(new Piece("w", "B", 6, 1));
-    pieces.push(new Piece("w", "N", 7, 1));
-    pieces.push(new Piece("w", "R", 8, 1));
-}
 
 // Piece object:
 // colour either "w" or "b"
 // type either "P", "K", "N", "B", "Q", or "R"
 function Piece(colour, type, x, y)
 {
-    this.x = (x - 1) * tile_size;
-    this.y = (grid_size - y) * tile_size;
+    this.x = x;
+    this.y = y;
     this.colour = colour;
     this.type = type;
 
     this.move = function(x, y)
     {
-        this.x = (x - 1) * tile_size;
-        this.y = (grid_size - y) * tile_size;
+        // Free up previous square
+        if(type != "M")
+        {
+            board[this.x][this.y] = 0;
+        }
+
+        this.x = x;
+        this.y = y;
     }
     
     this.draw = function()
     {
         const imageKey = `${this.colour}${this.type}`;
         const image = assets[imageKey];
-        ctx.drawImage(image, this.x, this.y);
-    }
-
-    this.get_x = function()
-    {
-        return this.x / tile_size + 1;
-    }
-
-    this.get_y = function()
-    {
-        return grid_size - (this.y / tile_size);
+        ctx.drawImage(image, x * tile_size, (grid_size - y - 1) * tile_size);
     }
 
     this.move(x, y);
 }
 
+function pieces_setup()
+{
+    // Black Pieces
+    board[0][6] = new Piece("b", "P", 0, 6);
+    board[1][6] = new Piece("b", "P", 1, 6);
+    board[2][6] = new Piece("b", "P", 2, 6);
+    board[3][6] = new Piece("b", "P", 3, 6);
+    board[4][6] = new Piece("b", "P", 4, 6);
+    board[5][6] = new Piece("b", "P", 5, 6);
+    board[6][6] = new Piece("b", "P", 6, 6);
+    board[7][6] = new Piece("b", "P", 7, 6);
+
+    board[0][7] = new Piece("b", "R", 0, 7);
+    board[1][7] = new Piece("b", "N", 1, 7);
+    board[2][7] = new Piece("b", "B", 2, 7);
+    board[3][7] = new Piece("b", "Q", 3, 7);
+    board[4][7] = new Piece("b", "K", 4, 7);
+    board[5][7] = new Piece("b", "B", 5, 7);
+    board[6][7] = new Piece("b", "N", 6, 7);
+    board[7][7] = new Piece("b", "R", 7, 7);
+
+    // White Pieces
+    board[0][1] = new Piece("w", "P", 0, 1);
+    board[1][1] = new Piece("w", "P", 1, 1);
+    board[2][1] = new Piece("w", "P", 2, 1);
+    board[3][1] = new Piece("w", "P", 3, 1);
+    board[4][1] = new Piece("w", "P", 4, 1);
+    board[5][1] = new Piece("w", "P", 5, 1);
+    board[6][1] = new Piece("w", "P", 6, 1);
+    board[7][1] = new Piece("w", "P", 7, 1);
+
+    board[0][0] = new Piece("w", "R", 0, 0);
+    board[1][0] = new Piece("w", "N", 1, 0);
+    board[2][0] = new Piece("w", "B", 2, 0);
+    board[3][0] = new Piece("w", "Q", 3, 0);
+    board[4][0] = new Piece("w", "K", 4, 0);
+    board[5][0] = new Piece("w", "B", 5, 0);
+    board[6][0] = new Piece("w", "N", 6, 0);
+    board[7][0] = new Piece("w", "R", 7, 0);
+
+
+
+
+    board[3][3] = new Piece("w", "R", 3, 3);
+}
+
+
 function draw_pieces()
 {
-    pieces.forEach(piece => piece.draw());
+    board.forEach(row => {
+        row.forEach(piece => {
+            if(piece != 0)
+            {
+                piece.draw()
+            }
+        });
+    });
 }
 
 function draw_markers()
 {
-    markers.forEach(marker => marker.draw());
+    markers.forEach(row => {
+        row.forEach(marker => {
+            if(marker != 0)
+            {
+                marker.draw()
+            }
+        });
+    });
 }
 
 function load_assets()
