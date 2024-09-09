@@ -53,20 +53,36 @@ function display_possible_moves(colour, type, x, y)
     switch(type)
     {
         case "P":
-            pawn_scan(x, y);
+            if(turn === "w")
+            {
+                static_scan(x, y, 0, 1);
+                static_scan(x, y, 0, 2);
+            }
+            else
+            {
+                static_scan(x, y, 0, -1);
+                static_scan(x, y, 0, -2);
+            }
             break;
         case "N":
-            knight_scan(x, y, -2, -1);
-            knight_scan(x, y, -2, 1);
-            knight_scan(x, y, -1, 2);
-            knight_scan(x, y, -1, -2);
-            knight_scan(x, y, 1, 2);
-            knight_scan(x, y, 1, -2);
-            knight_scan(x, y, 2, -1);
-            knight_scan(x, y, 2, 1);
+            static_scan(x, y, -2, -1);
+            static_scan(x, y, -2, 1);
+            static_scan(x, y, -1, 2);
+            static_scan(x, y, -1, -2);
+            static_scan(x, y, 1, 2);
+            static_scan(x, y, 1, -2);
+            static_scan(x, y, 2, -1);
+            static_scan(x, y, 2, 1);
             break;
         case "K":
-            king_scan(x, y);
+            static_scan(x, y, -1, -1);
+            static_scan(x, y, -1, 0);
+            static_scan(x, y, -1, 1);
+            static_scan(x, y, 0, -1);
+            static_scan(x, y, 0, 1);
+            static_scan(x, y, 1, -1);
+            static_scan(x, y, 1, 0);
+            static_scan(x, y, 1, 1);
             break;
         case "B":
             piece_scan(x, y, 1, 1);
@@ -93,30 +109,11 @@ function display_possible_moves(colour, type, x, y)
     }
 }
 
-function pawn_scan(x, y)
-
-function knight_scan(x, y, mx, my)
+function static_scan(x, y, mx, my)
 {
     if(in_grid(x+mx, y+my) && (!is_piece(x+mx, y+my) || board[x+mx][y+my].colour != turn))
     {
         markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
-    }
-}
-
-function king_scan(x, y)
-{
-    for(let i = -1; i < 2; i++)
-    {
-        for(let j = -1; j < 2; j++)
-        {
-            if(!(i === 0 && j === 0) && in_grid(x + i, y + j))
-            {
-                if(!is_piece(x + i, y + j) || board[x + i][y + j].colour != turn)
-                {
-                    markers[x + i][y + j] = new Piece("g", "M", x + i, y + j);
-                }
-            }
-        }
     }
 }
 
