@@ -10,6 +10,9 @@ const markers = [];
 
 let turn = "w";
 
+let clicked_x = 0;
+let clicked_y = 0;
+
 main();
 
 function main()
@@ -151,6 +154,22 @@ canvas.addEventListener('click', function(event)
     const x = Math.round((event.clientX - rect.left - (tile_size / 2)) / tile_size);
     const y = grid_size - Math.round((event.clientY - rect.top - (tile_size / 2)) / tile_size) -1;
 
+    
+    // Check if a marker was clicked
+    if(markers[x][y] != 0)
+    {
+        board[clicked_x][clicked_y].move(x, y);
+        
+        if(turn === "w")
+        {
+            turn = "b";
+        }
+        else
+        {
+            turn = "w";
+        }
+    }
+
     // Clear all markers
     for(let i = 0; i < grid_size; i++)
     {
@@ -166,6 +185,8 @@ canvas.addEventListener('click', function(event)
         if(turn === board[x][y].colour)
         {
             display_possible_moves(board[x][y].colour,  board[x][y].type, x, y);
+            clicked_x = x;
+            clicked_y = y;
         }
     }
 
@@ -184,24 +205,22 @@ function Piece(colour, type, x, y)
 
     this.move = function(x, y)
     {
-        // Free up previous square
+        // Create a new piece at the new position
+        board[x][y] = new Piece(this.colour, this.type, x, y);
+
+        // Delete the old piece (this one)
         if(type != "M")
         {
             board[this.x][this.y] = 0;
         }
-
-        this.x = x;
-        this.y = y;
     }
     
     this.draw = function()
     {
         const imageKey = `${this.colour}${this.type}`;
         const image = assets[imageKey];
-        ctx.drawImage(image, x * tile_size, (grid_size - y - 1) * tile_size);
+        ctx.drawImage(image, this.x * tile_size, (grid_size - this.y - 1) * tile_size);
     }
-
-    this.move(x, y);
 }
 
 function pieces_setup()
