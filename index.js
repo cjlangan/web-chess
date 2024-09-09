@@ -4,6 +4,9 @@ const capture_sound = document.getElementById('captureSound');
 const check_sound = document.getElementById('checkSound');
 const ctx = canvas.getContext('2d');
 
+const size = Math.round(0.8 * Math.min(window.innerHeight, window.innerWidth) / 8) * 8;
+canvas.height = size;
+canvas.width = size;
 const grid_size = 8;
 const tile_size = canvas.width / grid_size;
 
@@ -303,7 +306,8 @@ function Piece(colour, type, x, y)
     {
         const imageKey = `${this.colour}${this.type}`;
         const image = assets[imageKey];
-        ctx.drawImage(image, this.x * tile_size, (grid_size - this.y - 1) * tile_size);
+        ctx.drawImage(image, this.x * tile_size, (grid_size - this.y - 1) * tile_size
+                        , tile_size, tile_size);
     }
 }
 
