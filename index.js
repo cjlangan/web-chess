@@ -59,12 +59,18 @@ function display_possible_moves(colour, type, x, y)
             if(turn === "w")
             {
                 static_scan(x, y, 0, 1);
-                static_scan(x, y, 0, 2);
+                if(board[x][y].num_moves === 0)
+                {
+                    static_scan(x, y, 0, 2);
+                }
             }
             else
             {
                 static_scan(x, y, 0, -1);
-                static_scan(x, y, 0, -2);
+                if(board[x][y].num_moves === 0)
+                {
+                    static_scan(x, y, 0, -2);
+                }
             }
             break;
         case "N":
@@ -202,11 +208,13 @@ function Piece(colour, type, x, y)
     this.y = y;
     this.colour = colour;
     this.type = type;
+    this.num_moves = 0;
 
     this.move = function(x, y)
     {
         // Create a new piece at the new position
         board[x][y] = new Piece(this.colour, this.type, x, y);
+        board[x][y].num_moves = this.num_moves + 1;
 
         // Delete the old piece (this one)
         if(type != "M")
