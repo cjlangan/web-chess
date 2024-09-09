@@ -262,15 +262,6 @@ function pieces_setup()
     board[5][0] = new Piece("w", "B", 5, 0);
     board[6][0] = new Piece("w", "N", 6, 0);
     board[7][0] = new Piece("w", "R", 7, 0);
-
-
-
-
-    board[3][3] = new Piece("w", "R", 3, 3);
-    board[4][3] = new Piece("w", "B", 4, 3);
-    board[2][3] = new Piece("w", "Q", 2, 3);
-    board[5][3] = new Piece("w", "N", 5, 3);
-    board[6][3] = new Piece("w", "K", 6, 3);
 }
 
 
