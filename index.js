@@ -1,4 +1,7 @@
 const canvas = document.getElementById('gameCanvas');
+const move_sound = document.getElementById('moveSound');
+const capture_sound = document.getElementById('captureSound');
+const check_sound = document.getElementById('checkSound');
 const ctx = canvas.getContext('2d');
 
 const grid_size = 8;
@@ -185,6 +188,15 @@ canvas.addEventListener('click', function(event)
     // Check if a marker was clicked
     if(markers[x][y] != 0)
     {
+        if(is_piece(x, y))
+        {
+            capture_sound.play();
+        }
+        else
+        {
+            move_sound.play();
+        }
+        
         board[clicked_x][clicked_y].move(x, y);
         
         if(turn === "w")
