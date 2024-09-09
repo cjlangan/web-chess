@@ -96,6 +96,22 @@ function display_possible_moves(colour, type, x, y)
             static_scan(x, y, 1, -1);
             static_scan(x, y, 1, 0);
             static_scan(x, y, 1, 1);
+
+            // Check left for castling
+            if(board[x][y].num_moves === 0 && !is_piece(x-1, y) && !is_piece(x-2, y)
+                && !is_piece(x-3, y) && is_valid_rook(x-4, y))
+            {
+                markers[x-2][y] = new Piece("g", "M", x-2, y);
+                markers[x-2][y].castlable = "l";
+            }
+            // Check right for castling
+            if(board[x][y].num_moves === 0 && !is_piece(x+1, y) && !is_piece(x+2, y)
+                && is_valid_rook(x+3, y))
+            {
+                markers[x+2][y] = new Piece("g", "M", x+2, y);
+                markers[x+2][y].castlable = "r";
+            }
+
             break;
         case "B":
             piece_scan(x, y, 1, 1);
@@ -120,6 +136,12 @@ function display_possible_moves(colour, type, x, y)
             piece_scan(x, y, 0, -1);
             break;
     }
+}
+
+function is_valid_rook(x, y)
+{
+    return is_piece(x, y) && board[x][y].type === "R" && board[x][y].colour === turn 
+                            && board[x][y].num_moves === 0;
 }
 
 function pawn_scan(x, y, mx, my)
@@ -188,6 +210,7 @@ canvas.addEventListener('click', function(event)
     // Check if a marker was clicked
     if(markers[x][y] != 0)
     {
+        // Play proper sound
         if(is_piece(x, y))
         {
             capture_sound.play();
@@ -198,7 +221,19 @@ canvas.addEventListener('click', function(event)
         }
         
         board[clicked_x][clicked_y].move(x, y);
+
+        // Check for castling and castle.
+        switch(markers[x][y].castlable)
+        {
+            case "l":
+                board[x-2][y].move(x+1, y);
+                break;
+            case "r":
+                board[x+1][y].move(x-1, y);
+                break;
+        }
         
+        // Change Turn
         if(turn === "w")
         {
             turn = "b";
@@ -242,6 +277,7 @@ function Piece(colour, type, x, y)
     this.colour = colour;
     this.type = type;
     this.num_moves = 0;
+    this.castlable = 0;
 
     this.move = function(x, y)
     {
