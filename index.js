@@ -10,6 +10,7 @@ const markers = [];
 
 let turn = "w";
 
+// Coordinates of last clicked piece.
 let clicked_x = 0;
 let clicked_y = 0;
 
@@ -138,7 +139,6 @@ function pawn_scan(x, y, mx, my)
     }
 }
 
-
 function static_scan(x, y, mx, my)
 {
     if(in_grid(x+mx, y+my) && (!is_piece(x+mx, y+my) || board[x+mx][y+my].colour != turn))
@@ -236,6 +236,13 @@ function Piece(colour, type, x, y)
         // Create a new piece at the new position
         board[x][y] = new Piece(this.colour, this.type, x, y);
         board[x][y].num_moves = this.num_moves + 1;
+
+        // Check for pawn promotion
+        if(this.type === "P" && ((y === grid_size - 1 && this.colour === "w") || 
+                                             (y === 0 && this.colour === "b")))
+        {
+            board[x][y].type = "Q";
+        }
 
         // Delete the old piece (this one)
         if(type != "M")
