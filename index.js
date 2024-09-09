@@ -58,18 +58,18 @@ function display_possible_moves(colour, type, x, y)
         case "P":
             if(turn === "w")
             {
-                static_scan(x, y, 0, 1);
+                pawn_scan(x, y, 0, 1);
                 if(board[x][y].num_moves === 0)
                 {
-                    static_scan(x, y, 0, 2);
+                    pawn_scan(x, y, 0, 2);
                 }
             }
             else
             {
-                static_scan(x, y, 0, -1);
+                pawn_scan(x, y, 0, -1);
                 if(board[x][y].num_moves === 0)
                 {
-                    static_scan(x, y, 0, -2);
+                    pawn_scan(x, y, 0, -2);
                 }
             }
             break;
@@ -117,6 +117,27 @@ function display_possible_moves(colour, type, x, y)
             break;
     }
 }
+
+function pawn_scan(x, y, mx, my)
+{
+    if(in_grid(x+mx, y+my) && !is_piece(x+mx, y+my))
+    {
+        markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
+    }
+    if(my === -1 || my === 1)
+    {
+        if(in_grid(x-1, y+my) && is_piece(x-1, y+my) && board[x-1][y+my].colour != turn)
+        {
+            markers[x-1][y+my] = new Piece("g", "M", x-1, y+my);
+        }
+        if(in_grid(x+1, y+my) && is_piece(x+1, y+my) && board[x+1][y+my].colour != turn)
+        {
+            markers[x+1][y+my] = new Piece("g", "M", x+1, y+my);
+        }
+
+    }
+}
+
 
 function static_scan(x, y, mx, my)
 {
