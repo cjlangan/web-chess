@@ -12,6 +12,8 @@ const board = [];
 const markers = [];
 
 let turn = "w";
+let in_check = false;
+let bKx = 4, bKy = 7, wKx = 4, wKy = 0;
 
 // Coordinates of last clicked piece.
 let clicked_x = 0;
@@ -66,6 +68,100 @@ function initialise_board()
             markers[i][j] = 0;
         }
     }
+}
+
+function check_for_check()
+{
+    let x = 0;
+    let y = 0;
+
+    if(turn === "b")
+    {
+        x = wKx;
+        y = wKy;
+    }
+    else
+    {
+        x = bKx;
+        y = bKy;
+    }
+
+    // Scan upper left
+    piece = king_piece_scan(x, y, -1, 1);
+    if(piece === "B" || piece === "Q")
+    {
+        return true;
+    }
+    // Scan upper right
+    piece = king_piece_scan(x, y, 1, 1);
+    if(piece === "B" || piece === "Q")
+    {
+        return true;
+    }
+    // Scan bottom left
+    piece = king_piece_scan(x, y, -1, -1);
+    if(piece === "B" || piece === "Q")
+    {
+        return true;
+    }
+    // Scan bottom right
+    piece = king_piece_scan(x, y, 1, -1);
+    if(piece === "B" || piece === "Q")
+    {
+        return true;
+    }
+
+    // Scan top
+    piece = king_piece_scan(x, y, 0, 1);
+    if(piece === "R" || piece === "Q")
+    {
+        return true;
+    }
+    // Scan down
+    piece = king_piece_scan(x, y, 0, -1);
+    if(piece === "R" || piece === "Q")
+    {
+        return true;
+    }
+    // Scan left
+    piece = king_piece_scan(x, y, -1, 0);
+    if(piece === "R" || piece === "Q")
+    {
+        return true;
+    }
+    // Scan right
+    piece = king_piece_scan(x, y, 1, 0);
+    if(piece === "R" || piece === "Q")
+    {
+        return true;
+    }
+
+}
+
+function king_static_scan(x, y, mx, my)
+{
+    if(in_grid(x+mx, y+my) && (!is_piece(x+mx, y+my) || board[x+mx][y+my].colour != turn))
+    {
+        console.log("hi");
+    }
+}
+
+function king_piece_scan(x, y, marker_x, marker_y)
+{
+    mx = marker_x;
+    my = marker_y;
+    let piece = 0;
+
+    while(in_grid(x+mx, y+my) && !is_piece(x+mx, y+my))
+    {
+        mx += marker_x;
+        my += marker_y;
+    }
+    if(in_grid(x+mx, y+my) && is_piece(x+mx, y+my) && board[x+mx][y+my].colour === turn)
+    {
+        piece = board[x+mx][y+my].type;
+    }
+    return piece;
 }
 
 function display_possible_moves(colour, type, x, y)
@@ -223,17 +319,24 @@ canvas.addEventListener('click', function(event)
     // Check if a marker was clicked
     if(markers[x][y] != 0)
     {
-        // Play proper sound
-        if(is_piece(x, y))
-        {
-            capture_sound.play();
-        }
-        else
-        {
-            move_sound.play();
-        }
-        
+        was_piece = !(board[x][y] === 0);
+                
         board[clicked_x][clicked_y].move(x, y);
+
+        // Check if a king was moved and update global position
+        if(board[x][y].type === "K")
+        {
+            if(turn === "w")
+            {
+                wKx = x;
+                wKy = y;
+            }
+            else
+            {
+                bKx = x;
+                bKy = y;
+            }
+        }
 
         // Check for castling and castle.
         switch(markers[x][y].castlable)
@@ -245,6 +348,24 @@ canvas.addEventListener('click', function(event)
                 board[x+1][y].move(x-1, y);
                 break;
         }
+
+        // Scan for a check
+        in_check = check_for_check();
+
+        // Play proper sound
+        if(in_check)
+        {
+            check_sound.play();
+        }
+        else if(was_piece)
+        {
+            capture_sound.play();
+        }
+        else
+        {
+            move_sound.play();
+        }
+
         
         // Change Turn
         if(turn === "w")
