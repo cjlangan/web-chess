@@ -86,6 +86,64 @@ function check_for_check()
         y = bKy;
     }
 
+    // Scan for pawns
+    if(turn === "b")
+    {
+        if(king_static_scan(x, y, 1, 1) === "P")
+        {
+            return true;
+        }
+        if(king_static_scan(x, y, -1, 1) === "P")
+        {
+            return true;
+        }
+    }
+    else
+    {
+        if(king_static_scan(x, y, 1, -1) === "P")
+        {
+            return true;
+        }
+        if(king_static_scan(x, y, -1, -1) === "P")
+        {
+            return true;
+        }
+    }
+
+    // Scan for knights
+    if(king_static_scan(x, y, -2, -1) === "N")
+    {
+        return true;
+    }
+    if(king_static_scan(x, y, -2, 1) === "N")
+    {
+        return true;
+    }
+    if(king_static_scan(x, y, -1, -2) === "N")
+    {
+        return true;
+    }
+    if(king_static_scan(x, y, -1, 2) === "N")
+    {
+        return true;
+    }
+    if(king_static_scan(x, y, 2, -1) === "N")
+    {
+        return true;
+    }
+    if(king_static_scan(x, y, 2, 1) === "N")
+    {
+        return true;
+    }
+    if(king_static_scan(x, y, 1, -2) === "N")
+    {
+        return true;
+    }
+    if(king_static_scan(x, y, 1, 2) === "N")
+    {
+        return true;
+    }
+
     // Scan upper left
     piece = king_piece_scan(x, y, -1, 1);
     if(piece === "B" || piece === "Q")
@@ -140,10 +198,12 @@ function check_for_check()
 
 function king_static_scan(x, y, mx, my)
 {
-    if(in_grid(x+mx, y+my) && (!is_piece(x+mx, y+my) || board[x+mx][y+my].colour != turn))
+    let piece = 0;
+    if(in_grid(x+mx, y+my) && is_piece(x+mx, y+my) && board[x+mx][y+my].colour === turn)
     {
-        console.log("hi");
+        piece = board[x+mx][y+my].type;
     }
+    return piece;
 }
 
 function king_piece_scan(x, y, marker_x, marker_y)
