@@ -4,4 +4,3 @@ play at https://cjlangan.github.io/web-chess/
 
 ## Missing Features:
 - En Passant
-- A win screen

@@ -11,6 +11,7 @@ const assets = {};
 const board = [];
 const markers = [];
 
+let npm = 0;
 let turn = "w";
 let in_check = false;
 let bKx = 4, bKy = 7, wKx = 4, wKy = 0;
@@ -224,7 +225,7 @@ function king_piece_scan(x, y, marker_x, marker_y, king_colour)
     return piece;
 }
 
-function display_possible_moves(colour, type, x, y)
+function display_possible_moves(type, x, y)
 {
     switch(type)
     {
@@ -266,19 +267,22 @@ function display_possible_moves(colour, type, x, y)
             static_scan(x, y, 1, 0);
             static_scan(x, y, 1, 1);
 
-            // Check left for castling
-            if(board[x][y].num_moves === 0 && !is_piece(x-1, y) && !is_piece(x-2, y)
-                && !is_piece(x-3, y) && is_valid_rook(x-4, y))
+            if(!in_check)
             {
-                markers[x-2][y] = new Piece("g", "M", x-2, y);
-                markers[x-2][y].castlable = "l";
-            }
-            // Check right for castling
-            if(board[x][y].num_moves === 0 && !is_piece(x+1, y) && !is_piece(x+2, y)
-                && is_valid_rook(x+3, y))
-            {
-                markers[x+2][y] = new Piece("g", "M", x+2, y);
-                markers[x+2][y].castlable = "r";
+                // Check left for castling
+                if(board[x][y].num_moves === 0 && !is_piece(x-1, y) && !is_piece(x-2, y)
+                    && !is_piece(x-3, y) && is_valid_rook(x-4, y))
+                {
+                    markers[x-2][y] = new Piece("g", "M", x-2, y);
+                    markers[x-2][y].castlable = "l";
+                }
+                // Check right for castling
+                if(board[x][y].num_moves === 0 && !is_piece(x+1, y) && !is_piece(x+2, y)
+                    && is_valid_rook(x+3, y))
+                {
+                    markers[x+2][y] = new Piece("g", "M", x+2, y);
+                    markers[x+2][y].castlable = "r";
+                }
             }
 
             break;
@@ -320,6 +324,7 @@ function pawn_scan(x, y, mx, my)
         if(!test_for_check(x, y, x+mx, y+my))
         {
             markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
+            npm++;
         }
     }
     if(my === -1 || my === 1)
@@ -329,6 +334,7 @@ function pawn_scan(x, y, mx, my)
             if(!test_for_check(x, y, x-1, y+my))
             {
                 markers[x-1][y+my] = new Piece("g", "M", x-1, y+my);
+                npm++;
             }
         }
         if(in_grid(x+1, y+my) && is_piece(x+1, y+my) && board[x+1][y+my].colour != turn)
@@ -336,6 +342,7 @@ function pawn_scan(x, y, mx, my)
             if(!test_for_check(x, y, x+1, y+my))
             {
                 markers[x+1][y+my] = new Piece("g", "M", x+1, y+my);
+                npm++;
             }
         }
 
@@ -349,6 +356,7 @@ function static_scan(x, y, mx, my)
         if(!test_for_check(x, y, x+mx, y+my))
         {
             markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
+            npm++;
         }
     }
 }
@@ -363,6 +371,7 @@ function piece_scan(x, y, marker_x, marker_y)
         if(!test_for_check(x, y, x+mx, y+my))
         {
             markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
+            npm++;
         }
         mx += marker_x;
         my += marker_y;
@@ -372,6 +381,7 @@ function piece_scan(x, y, marker_x, marker_y)
         if(!test_for_check(x, y, x+mx, y+my))
         {
             markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
+            npm++;
         }
     }
 }
@@ -463,6 +473,28 @@ canvas.addEventListener('click', function(event)
         // Scan for a check
         in_check = check_for_check(turn);
 
+        // Check for a checkmate.
+        npm = 0;
+        if(in_check)
+        {
+            // Determine number of possible moves of all pieces.
+            for(let i = 0; i < grid_size; i++)
+            {
+                for(let j = 0; j < grid_size; j++)
+                {
+                    if(is_piece(i, j) && board[i][j].colour === turn)
+                    {
+                        display_possible_moves(board[i][j].type, i, j);
+                    }
+                }
+            }
+
+            if(npm === 0)
+            {
+                console.log("Win.");
+            }
+        }
+
         // Play proper sound
         if(in_check)
         {
@@ -492,7 +524,7 @@ canvas.addEventListener('click', function(event)
     {
         if(turn === board[x][y].colour)
         {
-            display_possible_moves(board[x][y].colour,  board[x][y].type, x, y);
+            display_possible_moves(board[x][y].type, x, y);
             clicked_x = x;
             clicked_y = y;
         }
