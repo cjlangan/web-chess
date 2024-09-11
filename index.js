@@ -400,6 +400,7 @@ function test_for_check(x, y, new_x, new_y)
 
     // Put piece at new postion theoretically
     let temp_moves = board[x][y].num_moves;
+    let temp_type = board[x][y].type;
     board[x][y].move(new_x, new_y);
 
     // Test if move puts own king in check.
@@ -411,6 +412,7 @@ function test_for_check(x, y, new_x, new_y)
     // Put piece back
     board[new_x][new_y].move(x, y);
     board[x][y].num_moves = temp_moves;
+    board[x][y].type = temp_type;
 
     // Put removal back
     if(was_piece)
