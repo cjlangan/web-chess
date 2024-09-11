@@ -438,21 +438,7 @@ canvas.addEventListener('click', function(event)
                 
         board[clicked_x][clicked_y].move(x, y);
 
-        // Check if a king was moved and update global position
-        if(board[x][y].type === "K")
-        {
-            if(turn === "w")
-            {
-                wKx = x;
-                wKy = y;
-            }
-            else
-            {
-                bKx = x;
-                bKy = y;
-            }
-        }
-
+        
         // Check for castling and castle.
         switch(markers[x][y].castlable)
         {
@@ -539,6 +525,21 @@ function Piece(colour, type, x, y)
         {
             board[x][y].type = "Q";
         }
+        
+        // Check if a king was moved and update global position
+        if(this.type === "K")
+        {
+            if(turn === "w")
+            {
+                wKx = x;
+                wKy = y;
+            }
+            else
+            {
+                bKx = x;
+                bKy = y;
+            }
+        }
 
         // Delete the old piece (this one)
         if(type != "M")
@@ -558,6 +559,22 @@ function Piece(colour, type, x, y)
         {
             board[x][y].type = "Q";
         }
+
+        // Check if a king was moved and update global position
+        if(this.type === "K")
+        {
+            if(turn === "w")
+            {
+                wKx = x;
+                wKy = y;
+            }
+            else
+            {
+                bKx = x;
+                bKy = y;
+            }
+        }
+
 
         // Delete the old piece (this one)
         if(type != "M")
