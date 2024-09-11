@@ -232,7 +232,7 @@ function display_possible_moves(colour, type, x, y)
             if(turn === "w")
             {
                 pawn_scan(x, y, 0, 1);
-                if(board[x][y].num_moves === 0)
+                if(board[x][y].num_moves === 0 && !is_piece(x, y+1))
                 {
                     pawn_scan(x, y, 0, 2);
                 }
@@ -240,7 +240,7 @@ function display_possible_moves(colour, type, x, y)
             else
             {
                 pawn_scan(x, y, 0, -1);
-                if(board[x][y].num_moves === 0)
+                if(board[x][y].num_moves === 0 && !is_piece(x, y-1))
                 {
                     pawn_scan(x, y, 0, -2);
                 }
