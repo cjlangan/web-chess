@@ -381,6 +381,7 @@ function test_for_check(x, y, new_x, new_y)
     let check = false;
 
     // Put piece at new postion theoretically
+    let temp_moves = board[x][y].num_moves;
     board[x][y].test_move(new_x, new_y);
 
     // Test if move puts own king in check.
@@ -391,6 +392,7 @@ function test_for_check(x, y, new_x, new_y)
 
     // Put piece back
     board[new_x][new_y].test_move(x, y);
+    board[x][y].num_moves = temp_moves;
 
     return check;
 }
