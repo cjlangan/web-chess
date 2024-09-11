@@ -390,7 +390,7 @@ function test_for_check(x, y, new_x, new_y)
 
     // Put piece at new postion theoretically
     let temp_moves = board[x][y].num_moves;
-    board[x][y].test_move(new_x, new_y);
+    board[x][y].move(new_x, new_y);
 
     // Test if move puts own king in check.
     if(check_for_check(turn))
@@ -399,7 +399,7 @@ function test_for_check(x, y, new_x, new_y)
     }
 
     // Put piece back
-    board[new_x][new_y].test_move(x, y);
+    board[new_x][new_y].move(x, y);
     board[x][y].num_moves = temp_moves;
 
     // Put removal back
@@ -547,43 +547,7 @@ function Piece(colour, type, x, y)
             board[this.x][this.y] = 0;
         }
     }
-
-    this.test_move = function(x, y)
-    {
-        // Create a new piece at the new position
-        board[x][y] = new Piece(this.colour, this.type, x, y);
-
-        // Check for pawn promotion
-        if(this.type === "P" && ((y === grid_size - 1 && this.colour === "w") || 
-                                             (y === 0 && this.colour === "b")))
-        {
-            board[x][y].type = "Q";
-        }
-
-        // Check if a king was moved and update global position
-        if(this.type === "K")
-        {
-            if(turn === "w")
-            {
-                wKx = x;
-                wKy = y;
-            }
-            else
-            {
-                bKx = x;
-                bKy = y;
-            }
-        }
-
-
-        // Delete the old piece (this one)
-        if(type != "M")
-        {
-            board[this.x][this.y] = 0;
-        }
-    }
-
-    
+   
     this.draw = function()
     {
         const imageKey = `${this.colour}${this.type}`;
