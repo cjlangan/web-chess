@@ -380,6 +380,14 @@ function test_for_check(x, y, new_x, new_y)
 {
     let check = false;
 
+    // if going to replace a piece, we need a copy of it to put back
+    let was_piece = is_piece(new_x, new_y);
+    if(was_piece)
+    {
+        temp_piece = new Piece(board[new_x][new_y].colour, board[new_x][new_y].type, 0, 0);
+        temp_piece.num_moves = board[new_x][new_y].num_moves;
+    }
+
     // Put piece at new postion theoretically
     let temp_moves = board[x][y].num_moves;
     board[x][y].test_move(new_x, new_y);
@@ -393,6 +401,14 @@ function test_for_check(x, y, new_x, new_y)
     // Put piece back
     board[new_x][new_y].test_move(x, y);
     board[x][y].num_moves = temp_moves;
+
+    // Put removal back
+    if(was_piece)
+    {
+        board[new_x][new_y] = new Piece(temp_piece.colour, temp_piece.type, new_x, new_y);
+        board[new_x][new_y].num_moves = temp_piece.num_moves;
+    }
+
 
     return check;
 }
