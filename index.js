@@ -70,12 +70,12 @@ function initialise_board()
     }
 }
 
-function check_for_check()
+function check_for_check(king_colour)
 {
     let x = 0;
     let y = 0;
 
-    if(turn === "b")
+    if(king_colour === "w")
     {
         x = wKx;
         y = wKy;
@@ -87,129 +87,129 @@ function check_for_check()
     }
 
     // Scan for pawns
-    if(turn === "b")
+    if(king_colour === "w")
     {
-        if(king_static_scan(x, y, 1, 1) === "P")
+        if(king_static_scan(x, y, 1, 1, king_colour) === "P")
         {
             return true;
         }
-        if(king_static_scan(x, y, -1, 1) === "P")
+        if(king_static_scan(x, y, -1, 1, king_colour) === "P")
         {
             return true;
         }
     }
     else
     {
-        if(king_static_scan(x, y, 1, -1) === "P")
+        if(king_static_scan(x, y, 1, -1, king_colour) === "P")
         {
             return true;
         }
-        if(king_static_scan(x, y, -1, -1) === "P")
+        if(king_static_scan(x, y, -1, -1, king_colour) === "P")
         {
             return true;
         }
     }
 
     // Scan for knights
-    if(king_static_scan(x, y, -2, -1) === "N")
+    if(king_static_scan(x, y, -2, -1, king_colour) === "N")
     {
         return true;
     }
-    if(king_static_scan(x, y, -2, 1) === "N")
+    if(king_static_scan(x, y, -2, 1, king_colour) === "N")
     {
         return true;
     }
-    if(king_static_scan(x, y, -1, -2) === "N")
+    if(king_static_scan(x, y, -1, -2, king_colour) === "N")
     {
         return true;
     }
-    if(king_static_scan(x, y, -1, 2) === "N")
+    if(king_static_scan(x, y, -1, 2, king_colour) === "N")
     {
         return true;
     }
-    if(king_static_scan(x, y, 2, -1) === "N")
+    if(king_static_scan(x, y, 2, -1, king_colour) === "N")
     {
         return true;
     }
-    if(king_static_scan(x, y, 2, 1) === "N")
+    if(king_static_scan(x, y, 2, 1, king_colour) === "N")
     {
         return true;
     }
-    if(king_static_scan(x, y, 1, -2) === "N")
+    if(king_static_scan(x, y, 1, -2, king_colour) === "N")
     {
         return true;
     }
-    if(king_static_scan(x, y, 1, 2) === "N")
+    if(king_static_scan(x, y, 1, 2, king_colour) === "N")
     {
         return true;
     }
 
     // Scan upper left
-    piece = king_piece_scan(x, y, -1, 1);
+    piece = king_piece_scan(x, y, -1, 1, king_colour);
     if(piece === "B" || piece === "Q")
     {
         return true;
     }
     // Scan upper right
-    piece = king_piece_scan(x, y, 1, 1);
+    piece = king_piece_scan(x, y, 1, 1, king_colour);
     if(piece === "B" || piece === "Q")
     {
         return true;
     }
     // Scan bottom left
-    piece = king_piece_scan(x, y, -1, -1);
+    piece = king_piece_scan(x, y, -1, -1, king_colour);
     if(piece === "B" || piece === "Q")
     {
         return true;
     }
     // Scan bottom right
-    piece = king_piece_scan(x, y, 1, -1);
+    piece = king_piece_scan(x, y, 1, -1, king_colour);
     if(piece === "B" || piece === "Q")
     {
         return true;
     }
 
     // Scan top
-    piece = king_piece_scan(x, y, 0, 1);
+    piece = king_piece_scan(x, y, 0, 1, king_colour);
     if(piece === "R" || piece === "Q")
     {
         return true;
     }
     // Scan down
-    piece = king_piece_scan(x, y, 0, -1);
+    piece = king_piece_scan(x, y, 0, -1, king_colour);
     if(piece === "R" || piece === "Q")
     {
         return true;
     }
     // Scan left
-    piece = king_piece_scan(x, y, -1, 0);
+    piece = king_piece_scan(x, y, -1, 0, king_colour);
     if(piece === "R" || piece === "Q")
     {
         return true;
     }
     // Scan right
-    piece = king_piece_scan(x, y, 1, 0);
+    piece = king_piece_scan(x, y, 1, 0, king_colour);
     if(piece === "R" || piece === "Q")
     {
         return true;
     }
-
+    return false;
 }
 
-function king_static_scan(x, y, mx, my)
+function king_static_scan(x, y, mx, my, king_colour)
 {
     let piece = 0;
-    if(in_grid(x+mx, y+my) && is_piece(x+mx, y+my) && board[x+mx][y+my].colour === turn)
+    if(in_grid(x+mx, y+my) && is_piece(x+mx, y+my) && board[x+mx][y+my].colour != king_colour)
     {
         piece = board[x+mx][y+my].type;
     }
     return piece;
 }
 
-function king_piece_scan(x, y, marker_x, marker_y)
+function king_piece_scan(x, y, marker_x, marker_y, king_colour)
 {
-    mx = marker_x;
-    my = marker_y;
+    let mx = marker_x;
+    let my = marker_y;
     let piece = 0;
 
     while(in_grid(x+mx, y+my) && !is_piece(x+mx, y+my))
@@ -217,7 +217,7 @@ function king_piece_scan(x, y, marker_x, marker_y)
         mx += marker_x;
         my += marker_y;
     }
-    if(in_grid(x+mx, y+my) && is_piece(x+mx, y+my) && board[x+mx][y+my].colour === turn)
+    if(in_grid(x+mx, y+my) && is_piece(x+mx, y+my) && board[x+mx][y+my].colour != king_colour)
     {
         piece = board[x+mx][y+my].type;
     }
@@ -317,17 +317,26 @@ function pawn_scan(x, y, mx, my)
 {
     if(in_grid(x+mx, y+my) && !is_piece(x+mx, y+my))
     {
-        markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
+        if(!test_for_check(x, y, x+mx, y+my))
+        {
+            markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
+        }
     }
     if(my === -1 || my === 1)
     {
         if(in_grid(x-1, y+my) && is_piece(x-1, y+my) && board[x-1][y+my].colour != turn)
         {
-            markers[x-1][y+my] = new Piece("g", "M", x-1, y+my);
+            if(!test_for_check(x, y, x-1, y+my))
+            {
+                markers[x-1][y+my] = new Piece("g", "M", x-1, y+my);
+            }
         }
         if(in_grid(x+1, y+my) && is_piece(x+1, y+my) && board[x+1][y+my].colour != turn)
         {
-            markers[x+1][y+my] = new Piece("g", "M", x+1, y+my);
+            if(!test_for_check(x, y, x+1, y+my))
+            {
+                markers[x+1][y+my] = new Piece("g", "M", x+1, y+my);
+            }
         }
 
     }
@@ -337,25 +346,53 @@ function static_scan(x, y, mx, my)
 {
     if(in_grid(x+mx, y+my) && (!is_piece(x+mx, y+my) || board[x+mx][y+my].colour != turn))
     {
-        markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
+        if(!test_for_check(x, y, x+mx, y+my))
+        {
+            markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
+        }
     }
 }
 
 function piece_scan(x, y, marker_x, marker_y)
 {
-    mx = marker_x;
-    my = marker_y;
+    let mx = marker_x;
+    let my = marker_y;
 
     while(in_grid(x+mx, y+my) && !is_piece(x+mx, y+my))
     {
-        markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
+        if(!test_for_check(x, y, x+mx, y+my))
+        {
+            markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
+        }
         mx += marker_x;
         my += marker_y;
     }
     if(in_grid(x+mx, y+my) && is_piece(x+mx, y+my) && board[x+mx][y+my].colour != turn)
     {
-        markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
+        if(!test_for_check(x, y, x+mx, y+my))
+        {
+            markers[x+mx][y+my] = new Piece("g", "M", x+mx, y+my);
+        }
     }
+}
+
+function test_for_check(x, y, new_x, new_y)
+{
+    let check = false;
+
+    // Put piece at new postion theoretically
+    board[x][y].test_move(new_x, new_y);
+
+    // Test if move puts own king in check.
+    if(check_for_check(turn))
+    {
+        check = true;
+    }
+
+    // Put piece back
+    board[new_x][new_y].test_move(x, y);
+
+    return check;
 }
 
 function in_grid(x, y)
@@ -379,7 +416,7 @@ canvas.addEventListener('click', function(event)
     // Check if a marker was clicked
     if(markers[x][y] != 0)
     {
-        was_piece = !(board[x][y] === 0);
+        let was_piece = !(board[x][y] === 0);
                 
         board[clicked_x][clicked_y].move(x, y);
 
@@ -409,8 +446,18 @@ canvas.addEventListener('click', function(event)
                 break;
         }
 
+        // Change Turn
+        if(turn === "w")
+        {
+            turn = "b";
+        }
+        else
+        {
+            turn = "w";
+        }
+
         // Scan for a check
-        in_check = check_for_check();
+        in_check = check_for_check(turn);
 
         // Play proper sound
         if(in_check)
@@ -424,17 +471,6 @@ canvas.addEventListener('click', function(event)
         else
         {
             move_sound.play();
-        }
-
-        
-        // Change Turn
-        if(turn === "w")
-        {
-            turn = "b";
-        }
-        else
-        {
-            turn = "w";
         }
     }
 
@@ -492,6 +528,26 @@ function Piece(colour, type, x, y)
             board[this.x][this.y] = 0;
         }
     }
+
+    this.test_move = function(x, y)
+    {
+        // Create a new piece at the new position
+        board[x][y] = new Piece(this.colour, this.type, x, y);
+
+        // Check for pawn promotion
+        if(this.type === "P" && ((y === grid_size - 1 && this.colour === "w") || 
+                                             (y === 0 && this.colour === "b")))
+        {
+            board[x][y].type = "Q";
+        }
+
+        // Delete the old piece (this one)
+        if(type != "M")
+        {
+            board[this.x][this.y] = 0;
+        }
+    }
+
     
     this.draw = function()
     {
