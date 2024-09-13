@@ -225,6 +225,25 @@ function king_piece_scan(x, y, marker_x, marker_y, king_colour)
     return piece;
 }
 
+function scan_passant(x, y)
+{
+    let passant = false;
+
+    if(in_grid(x, y) && is_piece(x, y) && board[x][y].can_passant && board[x][y].colour != turn)
+    {
+        if(turn === "w")
+        {
+            markers[x][y+1] = new Piece("g", "M", x, y+1);
+            markers[x][y+1].can_passant = true;
+        }
+        else
+        {
+            markers[x][y-1] = new Piece("g", "M", x, y-1);
+            markers[x][y-1].can_passant = true;
+        }
+    }
+}
+
 function display_possible_moves(type, x, y)
 {
     switch(type)
@@ -246,6 +265,9 @@ function display_possible_moves(type, x, y)
                     pawn_scan(x, y, 0, -2);
                 }
             }
+            // Check for En Passant
+            scan_passant(x-1, y);
+            scan_passant(x+1, y);
             break;
         case "N":
             static_scan(x, y, -2, -1);
@@ -447,10 +469,23 @@ canvas.addEventListener('click', function(event)
     if(markers[x][y] != 0)
     {
         let was_piece = !(board[x][y] === 0);
-                
+
+        // Check for En Passant
+        if(markers[x][y].can_passant)
+        {
+            if(turn === "w")
+            {
+                board[x][y-1].move(x, y);
+            }
+            else
+            {
+                board[x][y+1].move(x, y);
+            }
+            was_piece = true;
+        }
+        
         board[clicked_x][clicked_y].move(x, y);
 
-        
         // Check for castling and castle.
         switch(markers[x][y].castlable)
         {
@@ -461,7 +496,7 @@ canvas.addEventListener('click', function(event)
                 board[x+1][y].move(x-1, y);
                 break;
         }
-
+        
         // Change Turn
         if(turn === "w")
         {
@@ -546,6 +581,7 @@ function Piece(colour, type, x, y)
     this.type = type;
     this.num_moves = 0;
     this.castlable = 0;
+    this.can_passant = false;
 
     this.move = function(x, y)
     {
@@ -558,6 +594,12 @@ function Piece(colour, type, x, y)
                                              (y === 0 && this.colour === "b")))
         {
             board[x][y].type = "Q";
+        }
+
+        // Check if passantable
+        if(this.type === "P" && this.num_moves === 0 && (y === 3 || y === 4))
+        {
+            board[x][y].can_passant = true;
         }
         
         // Check if a king was moved and update global position
