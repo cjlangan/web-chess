@@ -3,30 +3,35 @@ const move_sound = document.getElementById('moveSound');
 const capture_sound = document.getElementById('captureSound');
 const check_sound = document.getElementById('checkSound');
 const ctx = canvas.getContext('2d');
-
-let tile_size;
 const grid_size = 8;
 
-const assets = {};
-const board = [];
-const markers = [];
+let assets = {};
+let board = [];
+let markers = [];
 
-let npm = 0;
-let turn = "w";
-let in_check = false;
-let bKx = 4, bKy = 7, wKx = 4, wKy = 0;
+let tile_size;
+let text;
+let npm;
+let turn;
+let in_check;
+let bKx;
+let bKy;
+let wKx; 
+let wKy;
 
 // Coordinates of last clicked piece.
-let clicked_x = 0;
-let clicked_y = 0;
+let clicked_x;
+let clicked_y;
 
 main();
 
 function main()
 {
     // Set up
+    set_variables();
     load_assets();
     resize_canvas();
+    initialise_font();
     initialise_board();
     
     // ensure assets are loaded
@@ -43,7 +48,30 @@ function render()
     make_board();
     draw_pieces();
     draw_markers();
+    draw_font(text);
 }
+
+function set_variables()
+{
+    text = "";
+
+    assets = {};
+    board.length = [];
+    markers = [];
+
+    npm = 0;
+    turn = "w";
+    in_check = false;
+    bKx = 4;
+    bKy = 7; 
+    wKx = 4; 
+    wKy = 0;
+
+    clicked_x = 0;
+    clicked_y = 0;
+}
+
+window.addEventListener('resize', resize_canvas);
 
 function resize_canvas()
 {
@@ -55,7 +83,14 @@ function resize_canvas()
     render();
 }
 
-window.addEventListener('resize', resize_canvas);
+// When r is pressed, the game restarts.
+document.addEventListener("keydown", function(event)
+{
+    if(event.key === "r")
+    {
+        main();
+    }
+});
 
 function initialise_board()
 {
@@ -68,6 +103,27 @@ function initialise_board()
             board[i][j] = 0;
             markers[i][j] = 0;
         }
+    }
+}
+
+function initialise_font()
+{
+    ctx.fillStyle = "white";
+    ctx.strokeStyle = "black";
+}
+
+function draw_font(str)
+{
+    ctx.textAlign = "center";
+    ctx.font = Math.round(tile_size / 2) + "px 'Cubano', sans-serif";
+    ctx.lineWidth = Math.round(tile_size / 10);
+    ctx.strokeText(str, canvas.width / 2, canvas.height / 2);
+    ctx.fillText(str, canvas.width / 2, canvas.height / 2);
+
+    if(str != "")
+    {
+        ctx.strokeText("Press 'r' to Restart", canvas.width / 2, canvas.height / 2 + tile_size);
+        ctx.fillText("Press 'r' to Restart", canvas.width / 2, canvas.height / 2 + tile_size);
     }
 }
 
@@ -528,7 +584,14 @@ canvas.addEventListener('click', function(event)
 
             if(npm === 0)
             {
-                console.log("Win.");
+                if(turn === "w")
+                {
+                    text = "Black Wins!"
+                }
+                else
+                {
+                    text = "White Wins!"
+                }
             }
         }
 
