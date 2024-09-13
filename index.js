@@ -35,7 +35,7 @@ function main()
     pieces_setup();
     render();
 
-    }, 300);
+    }, 500);
 }
 
 function render()
